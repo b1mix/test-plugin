@@ -3,9 +3,15 @@ package com.github.b1mix.testplugin
 import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.DyeColor
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.Player
+import org.bukkit.entity.Sheep
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.entity.EntityDamageByEntityEvent
+import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
@@ -26,31 +32,24 @@ class TestPlugin : JavaPlugin(), Listener {
 
         event.player.sendMessage(textComponent)
     }
+   @EventHandler
+   fun spawn(event: BlockBreakEvent) {
+
+       event.block.world.spawnEntity(event.block.location, EntityType.SHEEP)
+   }
     @EventHandler
-    fun Move(event: PlayerMoveEvent) {
+    fun color(event: EntityDamageByEntityEvent) {
 
-        event.player.addPotionEffect(PotionEffect(PotionEffectType.SPEED, 20*20, 30))
-
-        val textComponent1 : net.kyori.adventure.text.TextComponent = Component.text("Запущено", NamedTextColor.BLUE)
-
-        event.player.sendMessage(textComponent1)
+        if (event.damager is Player && event.entity is Sheep) {
+            val colorSheep = event.entity as Sheep
+            colorSheep.color = DyeColor.values().random()
+        }
     }
     @EventHandler
-    fun Jump(event: PlayerJumpEvent) {
+    fun zombie(event: EntityDeathEvent) {
+        if (event.entity.killer is Player && event.entity is Sheep) {
+            event.entity.world.spawnEntity(event.entity.location, EntityType.ZOMBIE)
+        }
 
-        event.player.addPotionEffect(PotionEffect(PotionEffectType.JUMP, 20*20, 30))
-
-        val textComponent2 : net.kyori.adventure.text.TextComponent = Component.text("Запущено", NamedTextColor.RED)
-
-        event.player.sendMessage(textComponent2)
-    }
-    @EventHandler
-    fun destroy(event: BlockBreakEvent) {
-
-        event.player.addPotionEffect(PotionEffect(PotionEffectType.FAST_DIGGING, 20*20, 220))
-
-        val textComponent3 : net.kyori.adventure.text.TextComponent = Component.text("Привет", NamedTextColor.LIGHT_PURPLE)
-
-        event.player.sendMessage(textComponent3)
     }
 }
