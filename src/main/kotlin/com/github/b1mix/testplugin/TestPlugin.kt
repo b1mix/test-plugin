@@ -7,6 +7,7 @@ import org.bukkit.DyeColor
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.entity.Sheep
+import org.bukkit.entity.Zombie
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
@@ -47,9 +48,25 @@ class TestPlugin : JavaPlugin(), Listener {
     }
     @EventHandler
     fun zombie(event: EntityDeathEvent) {
-        if (event.entity.killer is Player && event.entity is Sheep) {
-            event.entity.world.spawnEntity(event.entity.location, EntityType.ZOMBIE)
+        var timer = 5
+        val killer = event.entity.killer
+        if (killer is Player && event.entity is Sheep) {
+            server.scheduler.runTaskTimer(this, Runnable {
+                event.entity.world.spawnEntity(event.entity.location, EntityType.ZOMBIE)
+                killer.sendMessage(Component.text(timer))
+            }, 0, 20 * 5)
+
         }
 
+    }
+
+    @EventHandler
+    fun nick(event: EntityDamageByEntityEvent) {
+
+        if (event.damager is Player && event.entity is Zombie) {
+            val zombie = event.entity as Zombie
+            zombie.customName(Component.text("ABOBA", NamedTextColor.YELLOW))
+            zombie.isCustomNameVisible = true
+        }
     }
 }
