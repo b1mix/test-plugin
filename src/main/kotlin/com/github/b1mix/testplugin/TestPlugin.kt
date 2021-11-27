@@ -3,6 +3,7 @@ package com.github.b1mix.testplugin
 import com.destroystokyo.paper.event.player.PlayerJumpEvent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
+import org.bukkit.Bukkit
 import org.bukkit.DyeColor
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -48,13 +49,21 @@ class TestPlugin : JavaPlugin(), Listener {
     }
     @EventHandler
     fun zombie(event: EntityDeathEvent) {
-        var timer = 5
+        var timer = 0
         val killer = event.entity.killer
         if (killer is Player && event.entity is Sheep) {
-            server.scheduler.runTaskTimer(this, Runnable {
-                event.entity.world.spawnEntity(event.entity.location, EntityType.ZOMBIE)
-                killer.sendMessage(Component.text(timer))
-            }, 0, 20 * 5)
+            var taskId = 0
+            taskId = server.scheduler.runTaskTimer(this, Runnable {
+                timer++
+                if (timer == 5) {
+                    event.entity.world.spawnEntity(event.entity.location, EntityType.ZOMBIE)
+                    killer.sendMessage(Component.text(timer))
+                } else if (timer > 5) {
+                    Bukkit.getScheduler().cancelTask(taskId)
+                } else {
+                    killer.sendMessage(Component.text(timer))
+                }
+            }, 0, 20 * 1).taskId
 
         }
 
