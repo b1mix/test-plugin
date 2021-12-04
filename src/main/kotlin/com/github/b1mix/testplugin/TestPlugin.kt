@@ -47,7 +47,7 @@ class TestPlugin : JavaPlugin(), Listener {
             colorSheep.color = DyeColor.values().random()
         }
     }
-    @EventHandler
+
     fun zombie(event: EntityDeathEvent) {
         var timer = 0
         val killer = event.entity.killer
@@ -76,6 +76,18 @@ class TestPlugin : JavaPlugin(), Listener {
             val zombie = event.entity as Zombie
             zombie.customName(Component.text("ABOBA", NamedTextColor.YELLOW))
             zombie.isCustomNameVisible = true
+        }
+    }
+
+    @EventHandler
+    fun damage_zombie(event: EntityDamageByEntityEvent) {
+val entity = event.entity
+        val damager = event.damager
+        if (event.damager is Player && entity is Zombie) {
+            val damage = event.damage
+            val health = entity.health
+            val message = Component.text("$damage $health ")
+            damager.sendMessage(message)
         }
     }
 }
