@@ -90,4 +90,10 @@ val entity = event.entity
             damager.sendMessage(message)
         }
     }
+
+    @EventHandler
+    fun menu(event: PlayerJoinEvent) {
+      val menu= Inventory_menu (this, event.player, 5)
+        menu.open()
+    }
 }
